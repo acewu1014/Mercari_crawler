@@ -1,16 +1,14 @@
 from playwright.sync_api import sync_playwright
 import schedule
 import time
-import requests
 from datetime import datetime
 from urllib.parse import quote_plus
-from discord import discord_notify  # 你這邊定義的自訂 class，應該命名為 DiscordNotifier
-
+from discord import discord_notify
 # 搜尋關鍵字
 # "フーパ ポケモンカード"
 SEARCH_QUERIES = ["スヌーピー オラフ", "レックウザ",  "ゴッホ ピカチュウ ポケモンカード", "ポンチョを着たピカチュウ", "ムンク展", "バンデットリング", "アクア団のカイオーガEX", "マグマ団のグラードンEX", "メガトウキョーのピカチュウ"]
 notified_links = set()
-dc = discord_notify()  # 建議改名為 DiscordNotifier()
+dc = discord_notify()
 
 
 def scrape_mercari(search_query):
