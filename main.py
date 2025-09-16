@@ -3,44 +3,33 @@ import schedule
 import time
 import requests
 from datetime import datetime
+from urllib.parse import quote_plus
+from discord import discord_notify  # 你這邊定義的自訂 class，應該命名為 DiscordNotifier
 
-f = open(r"secret.txt", "r")
-# Discord Webhook URL
-DISCORD_WEBHOOK_URL = f.read()
-
-#Search Keywords
-SEARCH_QUERY = "スヌーピー オラフ"
+# 搜尋關鍵字
+# "フーパ ポケモンカード"
+SEARCH_QUERIES = ["スヌーピー オラフ", "レックウザ",  "ゴッホ ピカチュウ ポケモンカード", "ポンチョを着たピカチュウ", "ムンク展", "バンデットリング", "アクア団のカイオーガEX", "マグマ団のグラードンEX", "メガトウキョーのピカチュウ"]
 notified_links = set()
+dc = discord_notify()  # 建議改名為 DiscordNotifier()
 
-def send_discord_embed(title, price, link, image_url):
-    embed = {
-        "title": title,
-        "url": link,
-        "description": f"💰 NT{price}",
-        "image": {"url": image_url},
-        "color": 15844367  # 金黃色
-    }
-    payload = {
-        "embeds": [embed]
-    }
-    response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
-    print("Discord 發送狀態:", response.status_code)
 
-def scrape_mercari():
+def scrape_mercari(search_query):
     global notified_links
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        search_url = f"https://jp.mercari.com/search?keyword={SEARCH_QUERY}&sort=created_time&order=desc"
-        page.goto(search_url)
-        try:
-            page.wait_for_selector("li[data-testid='item-cell']", timeout=60000)
 
+        encoded_query = quote_plus(search_query)
+        search_url = f"https://jp.mercari.com/search?keyword={encoded_query}&sort=created_time&order=desc"
+
+        try:
+            page.goto(search_url, wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_selector("li[data-testid='item-cell']", timeout=60000)
         except Exception as e:
-            print("⚠️ 無法載入商品清單，可能被廣告擋住或網路過慢")
+            print(f"⚠️ 無法載入商品清單（關鍵字：{search_query}），錯誤: {e}")
             browser.close()
             return
-    
+
         items = page.query_selector_all("li[data-testid='item-cell']")
         new_items = []
 
@@ -50,21 +39,18 @@ def scrape_mercari():
                 img_tag = item.query_selector("img")
                 price_tag = item.query_selector("span.number__6b270ca7")
 
-                # 資訊不完整則跳過
                 if not link_tag or not img_tag or not price_tag:
                     continue
 
-                # 取得資料
                 link = link_tag.get_attribute("href")
                 full_link = f"https://jp.mercari.com{link}"
+                if full_link in notified_links:
+                    continue
 
                 image_url = img_tag.get_attribute("src")
                 title = img_tag.get_attribute("alt")
                 price = price_tag.text_content()
 
-                if full_link in notified_links:
-                    continue
-                
                 new_items.append({
                     "title": title,
                     "price": price,
@@ -73,25 +59,32 @@ def scrape_mercari():
                 })
                 notified_links.add(full_link)
 
-                print(new_items)
             except Exception as e:
-                print("錯誤：", e)
+                print("❌ 資料處理錯誤:", e)
                 continue
 
         if new_items:
             for item in new_items:
-                send_discord_embed(item['title'], item['price'], item['link'], item['image'])
-            print(f"[{datetime.now()}] 發送 {len(new_items)} 筆通知")
+                dc.send_discord_embed(item['title'], item['price'], item['link'], item['image'])
+            print(f"[{datetime.now()}] ✅ 發送 {len(new_items)} 筆通知")
         else:
-            print(f"[{datetime.now()}] 無新商品")
+            print(f"[{datetime.now()}] 💤 無新商品")
 
         browser.close()
 
-# 每 10 分鐘執行一次
-schedule.every(1).minutes.do(scrape_mercari)
 
-print(f"開始搜尋『{SEARCH_QUERY}』商品並推送到 Discord...")
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+def search():
+    for keyword in SEARCH_QUERIES:
+        print(f"\n🔍 開始搜尋關鍵字：『{keyword}』")
+        scrape_mercari(keyword)
 
+
+# 每 1 分鐘執行一次
+schedule.every(1).minutes.do(search)
+
+if __name__ == "__main__":
+    print("📦 Mercari 爬蟲啟動中...")
+    while True:
+        # schedule.run_pending()
+        # time.sleep(1)
+        search()
