@@ -1,5 +1,5 @@
 ![Build Status](https://github.com/acewu1014/Mercari_crawler/actions/workflows/devops-ci.yaml/badge.svg)
-## Project Name: Automatic Mercari Crawler& Discord Notifier
+## Project Name: Automatic Mercari Scrapper& Discord Notifier
 ## Descriptions
 A robust web scraping solution built with Python and Playwright to monitor Japanese e-commerce listings in real-time.
 
