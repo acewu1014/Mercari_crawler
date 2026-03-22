@@ -1,7 +1,18 @@
-![Build Status](https://github.com/acewu1014/Mercari_crawler/actions/workflows/devops-ci.yml/badge.svg)
+![Build Status](https://github.com/acewu1014/Mercari_crawler/actions/workflows/devops-ci.yaml/badge.svg)
 ## Project Name: Python Crawler
 ## Descriptions
-When dealing with long videos, precisely annotating their content becomes challenging. Therefore, existing methods typically use off the shelf shot detection modules, such as Shot Detector or other AI-based models, to segment long videos into smaller shots for annotation. However, there is currently no well-suited annotation tool for handling such segmented data. To address this issue, we propose this project to facilitate the rapid annotation of videos.
+Automated Mercari Scraper & Discord Notifier
+A robust web scraping solution built with Python and Playwright to monitor Japanese e-commerce listings in real-time.
+
+Key DevOps Features:
+
+1, Containerization: Fully dockerized environment for consistent deployment across different infrastructures.
+
+2, CI/CD Pipeline: Integrated GitHub Actions for automated linting (Flake8), dependency management, and build verification.
+
+3, Cloud-Native Security: Implemented secret management using environment variables to ensure secure handling of sensitive Webhook URLs.
+
+4, Infrastructure as Code (IaC) Ready: Designed with a modular architecture suitable for deployment on Kubernetes or cloud-based runners.
 
 ## Environment Setup
 1. **Create a virtual environment:**
@@ -34,5 +45,6 @@ Your foler should look like
 ## Start
 CMD:
 ```
-python main.py
+python main.py //if there is secret.txt in same directory
+python 
 ```
