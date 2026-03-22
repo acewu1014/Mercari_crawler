@@ -1,3 +1,4 @@
+![Build Status](https://github.com/acewu1014/Mercari_crawler/actions/workflows/devops-ci.yml/badge.svg)
 ## Project Name: Python Crawler
 ## Descriptions
 When dealing with long videos, precisely annotating their content becomes challenging. Therefore, existing methods typically use off the shelf shot detection modules, such as Shot Detector or other AI-based models, to segment long videos into smaller shots for annotation. However, there is currently no well-suited annotation tool for handling such segmented data. To address this issue, we propose this project to facilitate the rapid annotation of videos.
