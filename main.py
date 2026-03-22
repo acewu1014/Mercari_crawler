@@ -13,7 +13,6 @@ dc = discord_notify()
 
 
 def scrape_mercari(search_query):
-    global notified_links
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
